@@ -8,7 +8,7 @@ pub mod errors;
 pub mod state;
 
 use instructions::*;
-use buy::*;
+
 
 #[program]
 pub mod ticketregistry {
@@ -19,6 +19,11 @@ pub mod ticketregistry {
     }
     pub fn buy(ctx: Context<BuyContext>) -> Result<()> {
         _buy(ctx)
+    }
+
+    pub fn withdraw(ctx:Context<WithdrawContext>,amount:u64) -> Result<()>{
+        _withdraw(ctx,amount)
+
     }
 }
 

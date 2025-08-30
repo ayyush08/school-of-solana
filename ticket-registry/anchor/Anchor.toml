@@ -17,3 +17,4 @@ wallet = "~/.config/solana/id.json"
 
 [scripts]
 test = "vitest"
+
