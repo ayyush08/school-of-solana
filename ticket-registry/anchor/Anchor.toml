@@ -16,5 +16,5 @@ cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
-test = "vitest"
+test = "node_modules/.bin/jest --preset ts-jest"
 

@@ -9,7 +9,7 @@ pub enum TicketRegistryError {
     #[msg("Event description is too long")]
     DescriptionTooLong,
     #[msg("Start date is in the past")]
-    StartDateInPast,
+    StartDateInThePast,
     #[msg("Available tickets is too low")]
     AvailableTicketsTooLow,
     #[msg("All tickets sold out")]
