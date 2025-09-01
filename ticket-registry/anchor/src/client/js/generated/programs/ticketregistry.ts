@@ -13,13 +13,55 @@ import {
   type Address,
   type ReadonlyUint8Array,
 } from 'gill';
-import { type ParsedGreetInstruction } from '../instructions';
+import {
+  type ParsedBuyInstruction,
+  type ParsedInitializeInstruction,
+  type ParsedWithdrawInstruction,
+} from '../instructions';
 
 export const TICKETREGISTRY_PROGRAM_ADDRESS =
-  'JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H' as Address<'JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H'>;
+  'BSLK25vhw2Th7TmPYdnD4YRtBrRwujDM9SaeoWXzjJz' as Address<'BSLK25vhw2Th7TmPYdnD4YRtBrRwujDM9SaeoWXzjJz'>;
+
+export enum TicketregistryAccount {
+  Event,
+  Ticket,
+}
+
+export function identifyTicketregistryAccount(
+  account: { data: ReadonlyUint8Array } | ReadonlyUint8Array
+): TicketregistryAccount {
+  const data = 'data' in account ? account.data : account;
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([125, 192, 125, 158, 9, 115, 152, 233])
+      ),
+      0
+    )
+  ) {
+    return TicketregistryAccount.Event;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([41, 228, 24, 165, 78, 90, 235, 200])
+      ),
+      0
+    )
+  ) {
+    return TicketregistryAccount.Ticket;
+  }
+  throw new Error(
+    'The provided account could not be identified as a ticketregistry account.'
+  );
+}
 
 export enum TicketregistryInstruction {
-  Greet,
+  Buy,
+  Initialize,
+  Withdraw,
 }
 
 export function identifyTicketregistryInstruction(
@@ -30,12 +72,34 @@ export function identifyTicketregistryInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([203, 194, 3, 150, 228, 58, 181, 62])
+        new Uint8Array([102, 6, 61, 18, 1, 218, 235, 234])
       ),
       0
     )
   ) {
-    return TicketregistryInstruction.Greet;
+    return TicketregistryInstruction.Buy;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([175, 175, 109, 31, 13, 152, 155, 237])
+      ),
+      0
+    )
+  ) {
+    return TicketregistryInstruction.Initialize;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([183, 18, 70, 156, 148, 109, 161, 34])
+      ),
+      0
+    )
+  ) {
+    return TicketregistryInstruction.Withdraw;
   }
   throw new Error(
     'The provided instruction could not be identified as a ticketregistry instruction.'
@@ -43,7 +107,14 @@ export function identifyTicketregistryInstruction(
 }
 
 export type ParsedTicketregistryInstruction<
-  TProgram extends string = 'JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H',
-> = {
-  instructionType: TicketregistryInstruction.Greet;
-} & ParsedGreetInstruction<TProgram>;
+  TProgram extends string = 'BSLK25vhw2Th7TmPYdnD4YRtBrRwujDM9SaeoWXzjJz',
+> =
+  | ({
+      instructionType: TicketregistryInstruction.Buy;
+    } & ParsedBuyInstruction<TProgram>)
+  | ({
+      instructionType: TicketregistryInstruction.Initialize;
+    } & ParsedInitializeInstruction<TProgram>)
+  | ({
+      instructionType: TicketregistryInstruction.Withdraw;
+    } & ParsedWithdrawInstruction<TProgram>);

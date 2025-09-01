@@ -1,5 +1,5 @@
 import { WalletButton } from '../solana/solana-provider'
-import { TicketregistryCreate, TicketregistryProgram, TicketregistryProgramExplorerLink } from './ticketregistry-ui'
+import {  TicketregistryProgram, TicketregistryProgramExplorerLink } from './ticketregistry-ui'
 import { AppHero } from '../app-hero'
 import { useWalletUi } from '@wallet-ui/react'
 
@@ -21,12 +21,9 @@ export default function TicketregistryFeature() {
   return (
     <div>
       <AppHero title="Ticketregistry" subtitle={'Run the program by clicking the "Run program" button.'}>
-        <p className="mb-6">
-          <TicketregistryProgramExplorerLink />
-        </p>
-        <TicketregistryCreate />
-      </AppHero>
+        
       <TicketregistryProgram />
+      </AppHero>
     </div>
   )
 }

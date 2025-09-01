@@ -13,7 +13,7 @@ export function getTicketregistryProgramId(cluster: SolanaClusterId) {
     case 'solana:devnet':
     case 'solana:testnet':
       // This is the program ID for the Ticketregistry program on devnet and testnet.
-      return address('6z68wfurCMYkZG51s1Et9BJEd9nJGUusjHXNt4dGbNNF')
+      return address('BSLK25vhw2Th7TmPYdnD4YRtBrRwujDM9SaeoWXzjJz')
     case 'solana:mainnet':
     default:
       return TICKETREGISTRY_PROGRAM_ADDRESS

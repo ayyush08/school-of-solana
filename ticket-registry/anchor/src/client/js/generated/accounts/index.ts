@@ -6,6 +6,5 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from './buy';
-export * from './initialize';
-export * from './withdraw';
+export * from './event';
+export * from './ticket';

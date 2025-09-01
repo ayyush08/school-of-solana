@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "dependencies": {
     "@coral-xyz/anchor": "0.31.0",
     "jest": "^30.0.5"

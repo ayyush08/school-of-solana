@@ -1,11 +1,9 @@
-import { getTicketregistryProgramId, getGreetInstruction } from '@project/anchor'
+import { EVENT_DISCRIMINATOR, getEventDecoder, getTicketregistryProgramId } from '@project/anchor'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { useWalletUi } from '@wallet-ui/react'
-import { toastTx } from '@/components/toast-tx'
-import { useWalletTransactionSignAndSend } from '@/components/solana/use-wallet-transaction-sign-and-send'
-import { useWalletUiSigner } from '@/components/solana/use-wallet-ui-signer'
+import { Instruction, TransactionSigner, createTransaction, SolanaClient, signAndSendTransactionMessageWithSigners, getBase58Decoder, createSolanaClient, Address } from 'gill'
 
 export function useTicketregistryProgramId() {
   const { cluster } = useWalletUi()
@@ -22,18 +20,63 @@ export function useGetProgramAccountQuery() {
   })
 }
 
-export function useGreetMutation() {
-  const programAddress = useTicketregistryProgramId()
-  const txSigner = useWalletUiSigner()
-  const signAndSend = useWalletTransactionSignAndSend()
+export async function useProcessTransaction(
+  signer: TransactionSigner,
+  client: SolanaClient,
+  instructions: Instruction[]) {
+  const { value: latestBlockhash } = await client.rpc.getLatestBlockhash().send()
 
-  return useMutation({
-    mutationFn: async () => {
-      return await signAndSend(getGreetInstruction({ programAddress }), txSigner)
-    },
-    onSuccess: (signature) => {
-      toastTx(signature)
-    },
-    onError: () => toast.error('Failed to run program'),
+  const { simulateTransaction } = createSolanaClient({
+    urlOrMoniker: "https://api.devnet.solana.com",
+  });
+
+
+
+
+  toast.message("Creating transaction...")
+  const transaction = createTransaction({
+    latestBlockhash,
+    feePayer: signer,
+    version: 'legacy',
+    instructions: Array.isArray(instructions) ? instructions : [instructions],
   })
+  console.log("Transaction created:", transaction);
+
+  toast.message("Signing transaction...")
+  // const simulation = await simulateTransaction(transaction) -- to debug
+  // console.log("Simulation:",simulation);
+
+
+
+  const signature = await signAndSendTransactionMessageWithSigners(transaction);
+  console.log("Transaction signature:", signature);
+
+  toast.success(`${signature} successfully sent!`)
+  const decoder = getBase58Decoder()
+  const sig58 = decoder.decode(signature)
+  console.log(sig58)
+}
+
+export async function useGetEventAccounts(
+  client: SolanaClient,
+  programId: Address
+) {
+  const allAccounts = await client.rpc.getProgramAccounts(programId, {
+    encoding: 'base64'
+  }).send()
+
+  const filteredAccounts = allAccounts.filter((account) => {
+    const data = Buffer.from(account.account.data[0], 'base64')
+    const discriminator = data.subarray(0, 8)
+    return discriminator.equals(Buffer.from(EVENT_DISCRIMINATOR))
+  })
+
+  const decoder = getEventDecoder()
+
+  const decodedAccounts = filteredAccounts.map((account) => ({
+    address: account.pubkey,
+    data: decoder.decode(Buffer.from(account.account.data[0], "base64"))
+  }))
+
+  return decodedAccounts
 }

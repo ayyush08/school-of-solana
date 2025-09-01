@@ -6,13 +6,16 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-ticketregistry = "JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H"
+ticketregistry = "BSLK25vhw2Th7TmPYdnD4YRtBrRwujDM9SaeoWXzjJz"
+
+[programs.devnet]
+ticketregistry = "BSLK25vhw2Th7TmPYdnD4YRtBrRwujDM9SaeoWXzjJz"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
